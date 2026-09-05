@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Scheduler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caacupe+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root{
+          --board:#B8CDF8;
+          --board-alt:#A2BBF0;
+          --board-line:rgba(21,22,26,0.14);
+          --amber:#F2B33D;
+          --ink:#15161A;
+          --ink-soft:#63656F;
+          --paper:#FBFAF7;
+          --surface:#FFFFFF;
+          --line:#E4E1D9;
+          --accent:#2547D6;
+          --accent-dim:#1C36A8;
+          --moss:#1F8F5F;
+          --amber-status:#B9750A;
+          --brick:#C1352E;
+          --focus:#2547D6;
+        }
+
+        *{box-sizing:border-box;}
+        html,body{margin:0;padding:0;}
+
+        body{
+          background:var(--paper);
+          background-image:
+            linear-gradient(rgba(21,22,26,0.028) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(21,22,26,0.028) 1px, transparent 1px);
+          background-size:34px 34px;
+          color:var(--ink);
+          font-family:'Inter', sans-serif;
+          min-height:100vh;
+        }
+
+        a{color:inherit;}
+        ::selection{background:rgba(37,71,214,.2);}
+        *:focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+
+        .shell{
+          max-width:1080px;
+          margin:0 auto;
+          padding:0 24px 90px;
+        }
+
+        /* ---------- Board header ---------- */
+        header.board{
+          background:var(--board);
+          color:var(--ink);
+          padding:0;
+          position:relative;
+          overflow:hidden;
+          border-bottom:4px solid var(--ink);
+        }
+        header.board .board-inner{
+          max-width:1080px;
+          margin:0 auto;
+          padding:46px 24px 34px;
+        }
+        .board-eyebrow{
+          display:flex;
+          align-items:center;
+          gap:9px;
+          font-family:'IBM Plex Mono', monospace;
+          font-size:12px;
+          font-weight:700;
+          letter-spacing:.14em;
+          text-transform:uppercase;
+          color:rgba(21,22,26,0.72);
+          margin:0 0 18px;
+        }
+        .board-eyebrow .dot{
+          width:8px; height:8px;
+          border-radius:50%;
+          background:var(--ink);
+          box-shadow:0 0 0 3px rgba(21,22,26,0.1);
+          animation:blink 1.6s ease-in-out infinite;
+        }
+        @keyframes blink{0%,100%{opacity:1;} 50%{opacity:.25;}}
+
+        h1.title{
+          font-family:'Caacupe One', 'Inter', sans-serif;
+          font-weight:800;
+          font-size:clamp(30px, 5vw, 46px);
+          letter-spacing:.01em;
+          text-transform:uppercase;
+          margin:0 0 12px;
+          color:var(--ink);
+          display:flex;
+          flex-wrap:wrap;
+        }
+        h1.title .ch{
+          display:inline-block;
+          min-width:0.62em;
+        }
+        h1.title .ch.space{min-width:.32em;}
+
+        p.tagline{
+          margin:0;
+          color:rgba(21,22,26,0.75);
+          font-family:'IBM Plex Mono', monospace;
+          font-size:13.5px;
+          max-width:560px;
+          line-height:1.6;
+        }
+
+        .board-ticks{
+          display:flex;
+          height:6px;
+        }
+        .board-ticks span{
+          flex:1;
+          border-right:1px solid var(--board-line);
+        }
+        .board-ticks span:nth-child(4n){background:rgba(21,22,26,.22);}
+
+        /* ---------- Tabs (underline style) ---------- */
+        nav.tabs{
+          display:flex;
+          gap:28px;
+          border-bottom:1px solid var(--line);
+          margin:0 0 32px;
+          padding-top:26px;
+        }
+        nav.tabs button{
+          font-family:'IBM Plex Mono', monospace;
+          font-size:12.5px;
+          font-weight:600;
+          letter-spacing:.1em;
+          text-transform:uppercase;
+          background:none;
+          border:none;
+          color:var(--ink-soft);
+          padding:0 0 14px;
+          cursor:pointer;
+          position:relative;
+          transition:color .15s ease;
+        }
+        nav.tabs button::after{
+          content:"";
+          position:absolute;
+          left:0; right:0; bottom:-1px;
+          height:2px;
+          background:var(--accent);
+          transform:scaleX(0);
+          transform-origin:left;
+          transition:transform .2s ease;
+        }
+        nav.tabs button.active{color:var(--ink);}
+        nav.tabs button.active::after{transform:scaleX(1);}
+        nav.tabs button:hover:not(.active){color:var(--ink);}
+
+        main{padding-top:4px;}
+
+        section{display:none;}
+        section.active{display:block; animation:fadeIn .28s ease;}
+        @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+        h2.section-title{
+          font-family:'Caacupe One', 'Fraunces', serif;
+          font-size:23px;
+          font-weight:600;
+          margin:0 0 5px;
+          color:var(--ink);
+        }
+        p.section-sub{
+          margin:0 0 28px;
+          color:var(--ink-soft);
+          font-size:14px;
+        }
+
+        /* ---------- Form ---------- */
+        form.card-form{
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:24px 28px;
+          max-width:660px;
+        }
+        form.card-form .full{grid-column:1 / -1;}
+        label{
+          display:block;
+          font-family:'IBM Plex Mono', monospace;
+          font-size:11px;
+          font-weight:600;
+          letter-spacing:.09em;
+          text-transform:uppercase;
+          color:var(--ink-soft);
+          margin-bottom:9px;
+        }
+        input, select{
+          width:100%;
+          font-family:'Inter', sans-serif;
+          font-size:15.5px;
+          padding:8px 2px 10px;
+          border:none;
+          border-bottom:1.5px solid var(--line);
+          border-radius:0;
+          background:transparent;
+          color:var(--ink);
+          transition:border-color .15s ease;
+        }
+        textarea{
+          width:100%;
+          font-family:'Inter', sans-serif;
+          font-size:15px;
+          padding:11px 13px;
+          border:1.5px solid var(--line);
+          border-radius:6px;
+          background:var(--surface);
+          color:var(--ink);
+          resize:vertical;
+          min-height:46px;
+          transition:border-color .15s ease;
+        }
+        input:focus, select:focus, textarea:focus{
+          border-color:var(--accent);
+        }
+        .field-error{
+          color:var(--brick);
+          font-size:12px;
+          margin-top:7px;
+          font-family:'IBM Plex Mono', monospace;
+        }
+
+        button.primary{
+          font-family:'Inter', sans-serif;
+          font-size:13.5px;
+          font-weight:700;
+          letter-spacing:.03em;
+          text-transform:uppercase;
+          background:var(--accent);
+          color:#fff;
+          border:none;
+          padding:14px 28px;
+          border-radius:6px;
+          cursor:pointer;
+          box-shadow:4px 4px 0 var(--ink);
+          transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+        }
+        button.primary:hover{background:var(--accent-dim);}
+        button.primary:active{
+          transform:translate(4px,4px);
+          box-shadow:0 0 0 var(--ink);
+        }
+
+        button.ghost{
+          font-family:'IBM Plex Mono', monospace;
+          font-size:12px;
+          font-weight:600;
+          letter-spacing:.03em;
+          text-transform:uppercase;
+          background:transparent;
+          color:var(--ink);
+          border:1.5px solid var(--ink);
+          padding:8px 14px;
+          border-radius:5px;
+          cursor:pointer;
+          transition:background .15s ease, color .15s ease;
+        }
+        button.ghost:hover{background:var(--ink); color:#fff;}
+        button.ghost.danger{border-color:var(--brick); color:var(--brick);}
+        button.ghost.danger:hover{background:var(--brick); color:#fff;}
+
+        /* ---------- Search bar ---------- */
+        .search-row{
+          display:flex;
+          flex-wrap:wrap;
+          gap:22px;
+          align-items:flex-end;
+          margin-bottom:30px;
+          max-width:760px;
+        }
+        .search-row .field{min-width:170px; flex:1;}
+
+        /* ---------- Board rows (signature element) ---------- */
+        .ledger-list{
+          display:flex;
+          flex-direction:column;
+          border-top:1px solid var(--line);
+        }
+        .ledger-card{
+          position:relative;
+          background:transparent;
+          border-bottom:1px solid var(--line);
+          border-left:4px solid transparent;
+          border-radius:0;
+          padding:26px 22px 26px 24px;
+          display:grid;
+          grid-template-columns:1fr auto;
+          gap:22px;
+          align-items:center;
+          transition:background .15s ease;
+        }
+        .ledger-card:hover{background:rgba(37,71,214,.045);}
+        .ledger-card:has(.stamp.BOOKED){border-left-color:var(--moss);}
+        .ledger-card:has(.stamp.RESCHEDULED){border-left-color:var(--amber-status);}
+        .ledger-card:has(.stamp.CANCELLED){border-left-color:var(--brick); opacity:.62;}
+
+        .card-main{display:flex; flex-direction:column;}
+        .card-main .meta{
+          order:-1;
+          font-family:'IBM Plex Mono', monospace;
+          font-size:14.5px;
+          font-weight:600;
+          color:var(--ink);
+          display:flex;
+          gap:18px;
+          flex-wrap:wrap;
+          margin-bottom:9px;
+        }
+        .card-main .meta span:first-child{color:var(--ink-soft); font-weight:500;}
+        .card-main .names{
+          order:0;
+          font-family:'Caacupe One', 'Fraunces', serif;
+          font-size:16.5px;
+          font-weight:600;
+          margin:0;
+          color:var(--ink);
+        }
+        .card-main .reason{
+          order:1;
+          margin-top:9px;
+          font-size:13px;
+          color:var(--ink-soft);
+        }
+
+        .card-side{
+          display:flex;
+          flex-direction:column;
+          align-items:flex-end;
+          gap:14px;
+        }
+        .stamp{
+          font-family:'IBM Plex Mono', monospace;
+          font-size:11px;
+          font-weight:700;
+          letter-spacing:.06em;
+          text-transform:uppercase;
+          padding:5px 10px;
+          border-radius:3px;
+          white-space:nowrap;
+          color:#fff;
+        }
+        .stamp.BOOKED{background:var(--moss);}
+        .stamp.RESCHEDULED{background:var(--amber-status);}
+        .stamp.CANCELLED{background:var(--brick);}
+        .card-actions{display:flex; gap:8px;}
+
+        .empty-state{
+          text-align:center;
+          padding:60px 20px;
+          color:var(--ink-soft);
+          font-family:'IBM Plex Mono', monospace;
+          font-size:12.5px;
+          letter-spacing:.05em;
+          text-transform:uppercase;
+          border:1.5px dashed var(--line);
+          border-radius:8px;
+        }
+
+        /* ---------- Toast ---------- */
+        #toast{
+          position:fixed;
+          bottom:26px;
+          left:50%;
+          transform:translateX(-50%) translateY(20px);
+          background:var(--ink);
+          color:#fff;
+          padding:13px 20px;
+          border-radius:6px;
+          font-size:13.5px;
+          font-family:'Inter',sans-serif;
+          font-weight:500;
+          opacity:0;
+          pointer-events:none;
+          transition:opacity .2s ease, transform .2s ease;
+          max-width:min(90vw, 420px);
+          box-shadow:4px 4px 0 rgba(0,0,0,.2);
+          z-index:100;
+        }
+        #toast.show{opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto;}
+        #toast.error{background:var(--brick);}
+        #toast.success{background:var(--moss);}
+
+        /* ---------- Modal ---------- */
+        .modal-backdrop{
+          position:fixed; inset:0;
+          background:rgba(21,22,26,.55);
+          display:none;
+          align-items:center;
+          justify-content:center;
+          z-index:200;
+        }
+        .modal-backdrop.show{display:flex;}
+        .modal{
+          background:var(--surface);
+          border:1.5px solid var(--ink);
+          border-radius:8px;
+          padding:28px;
+          width:min(90vw, 380px);
+          box-shadow:6px 6px 0 rgba(0,0,0,.25);
+        }
+        .modal h3{
+          font-family:'Caacupe One', 'Fraunces', serif;
+          margin:0 0 18px;
+          font-size:19px;
+          color:var(--ink);
+        }
+        .modal .field{margin-bottom:20px;}
+        .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:6px;}
+
+        @media (max-width:640px){
+          form.card-form{grid-template-columns:1fr;}
+          .ledger-card{grid-template-columns:1fr;}
+          .card-side{align-items:flex-start; margin-top:10px;}
+          nav.tabs{gap:18px; overflow-x:auto;}
+          header.board .board-inner{padding:36px 20px 26px;}
+        }
+    </style>
+</head>
+<body>
+
+<header class="board">
+    <div class="board-inner">
+        <p class="board-eyebrow"><span class="dot"></span>Terminal &middot; Patient Scheduling Desk</p>
+        <h1 class="title" id="board-title" data-text="APPOINTMENT SCHEDULER"></h1>
+        <p class="tagline">BOOK &middot; RESCHEDULE &middot; CANCEL — all appointments tracked in real time.</p>
+    </div>
+    <div class="board-ticks">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+</header>
+
+<div class="shell">
+    <nav class="tabs">
+        <button data-tab="book" class="active">Book</button>
+        <button data-tab="all">All Appointments</button>
+        <button data-tab="search">Search</button>
+    </nav>
+
+    <main>
+        <!-- BOOK -->
+        <section id="tab-book" class="active">
+            <h2 class="section-title">Book an appointment</h2>
+            <p class="section-sub">Fill in the details below. Doctors cannot be double-booked at the same date and time.</p>
+            <form class="card-form" id="book-form" novalidate>
+                <div>
+                    <label for="b-patient">Patient name</label>
+                    <input id="b-patient" name="patientName" type="text" placeholder="e.g. Piyush Chaudhari">
+                    <div class="field-error" data-error-for="patientName"></div>
+                </div>
+                <div>
+                    <label for="b-doctor">Doctor name</label>
+                    <input id="b-doctor" name="doctorName" type="text" placeholder="e.g. Dr. Sharma">
+                    <div class="field-error" data-error-for="doctorName"></div>
+                </div>
+                <div>
+                    <label for="b-date">Appointment date</label>
+                    <input id="b-date" name="appointmentDate" type="date">
+                    <div class="field-error" data-error-for="appointmentDate"></div>
+                </div>
+                <div>
+                    <label for="b-time">Appointment time</label>
+                    <input id="b-time" name="appointmentTime" type="time" step="1">
+                    <div class="field-error" data-error-for="appointmentTime"></div>
+                </div>
+                <div class="full">
+                    <label for="b-reason">Reason (optional)</label>
+                    <textarea id="b-reason" name="reason" placeholder="e.g. Regular checkup"></textarea>
+                </div>
+                <div class="full">
+                    <button type="submit" class="primary">Book appointment</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ALL -->
+        <section id="tab-all">
+            <h2 class="section-title">All appointments</h2>
+            <p class="section-sub">Every appointment on record. Cancelled entries stay visible — never erased.</p>
+            <div id="all-list" class="ledger-list"></div>
+        </section>
+
+        <!-- SEARCH -->
+        <section id="tab-search">
+            <h2 class="section-title">Search appointments</h2>
+            <p class="section-sub">Filter by patient, doctor, and/or status. Leave a field blank to skip it.</p>
+            <div class="search-row">
+                <div class="field">
+                    <label for="s-patient">Patient name</label>
+                    <input id="s-patient" type="text" placeholder="e.g. Piyush">
+                </div>
+                <div class="field">
+                    <label for="s-doctor">Doctor name</label>
+                    <input id="s-doctor" type="text" placeholder="e.g. Sharma">
+                </div>
+                <div class="field">
+                    <label for="s-status">Status</label>
+                    <select id="s-status">
+                        <option value="">Any</option>
+                        <option value="BOOKED">Booked</option>
+                        <option value="RESCHEDULED">Rescheduled</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
+                <div class="field" style="flex:0 0 auto;">
+                    <button class="primary" id="search-btn" type="button">Search</button>
+                </div>
+            </div>
+            <div id="search-list" class="ledger-list"></div>
+        </section>
+    </main>
+</div>
+
+<!-- Reschedule modal -->
+<div class="modal-backdrop" id="reschedule-modal">
+    <div class="modal">
+        <h3>Reschedule appointment</h3>
+        <div class="field">
+            <label for="r-date">New date</label>
+            <input id="r-date" type="date">
+        </div>
+        <div class="field">
+            <label for="r-time">New time</label>
+            <input id="r-time" type="time" step="1">
+        </div>
+        <div class="modal-actions">
+            <button class="ghost" id="r-cancel">Cancel</button>
+            <button class="primary" id="r-confirm">Save changes</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+    // ---------- Split-flap title reveal ----------
+    (function(){
+      const el = document.getElementById('board-title');
+      const finalText = el.dataset.text;
+      const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const spans = [...finalText].map(ch => {
+        const span = document.createElement('span');
+        span.className = 'ch' + (ch === ' ' ? ' space' : '');
+        span.textContent = ch === ' ' ? '\u00A0' : ch;
+        return span;
+      });
+      spans.forEach(s => el.appendChild(s));
+
+      spans.forEach((span, i) => {
+        if(span.classList.contains('space')) return;
+        const finalChar = finalText[i];
+        let ticks = 0;
+        const maxTicks = 6 + Math.floor(Math.random()*6);
+        const interval = setInterval(() => {
+          ticks++;
+          if(ticks >= maxTicks){
+            span.textContent = finalChar;
+            clearInterval(interval);
+          } else {
+            span.textContent = charset[Math.floor(Math.random()*charset.length)];
+          }
+        }, 45);
+      });
+    })();
+
+    const API_BASE = 'http://localhost:8080/api/appointments';
+
+    // ---------- Tab switching ----------
+    document.querySelectorAll('nav.tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('main section').forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab === 'all') loadAll();
+      });
+    });
+
+    // ---------- Toast ----------
+    let toastTimer;
+    function showToast(message, type){
+      const el = document.getElementById('toast');
+      el.textContent = message;
+      el.className = 'show ' + (type || '');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ''; }, 3800);
+    }
+
+    // ---------- Helpers ----------
+    function clearFieldErrors(form){
+      form.querySelectorAll('.field-error').forEach(e => e.textContent = '');
+    }
+
+    function formatTime(t){
+      if(!t) return '';
+      const [h, m] = t.split(':');
+      const hour = parseInt(h, 10);
+      const suffix = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = ((hour + 11) % 12) + 1;
+      return `${hour12}:${m} ${suffix}`;
+    }
+
+    function formatDate(d){
+      if(!d) return '';
+      const dt = new Date(d + 'T00:00:00');
+      return dt.toLocaleDateString(undefined, { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    async function apiCall(url, options){
+      let res;
+      try{
+        res = await fetch(url, options);
+      }catch(err){
+        showToast('Could not reach the server. Is it running on localhost:8080?', 'error');
+        throw err;
+      }
+      let data = null;
+      try{ data = await res.json(); }catch(e){ /* no body */ }
+      if(!res.ok){
+        const err = new Error((data && data.message) || 'Something went wrong');
+        err.status = res.status;
+        err.data = data;
+        throw err;
+      }
+      return data;
+    }
+
+    // ---------- Card rendering ----------
+    function renderCard(appt){
+      const div = document.createElement('div');
+      div.className = 'ledger-card';
+      const canAct = appt.status !== 'CANCELLED';
+      div.innerHTML = `
+        <div class="card-main">
+          <p class="names">${appt.patientName} &nbsp;→&nbsp; ${appt.doctorName}</p>
+          <div class="meta">
+            <span>#${appt.id}</span>
+            <span>${formatDate(appt.appointmentDate)}</span>
+            <span>${formatTime(appt.appointmentTime)}</span>
+          </div>
+          ${appt.reason ? `<p class="reason">${appt.reason}</p>` : ''}
+        </div>
+        <div class="card-side">
+          <span class="stamp ${appt.status}">${appt.status}</span>
+          ${canAct ? `
+          <div class="card-actions">
+            <button class="ghost" data-action="reschedule" data-id="${appt.id}">Reschedule</button>
+            <button class="ghost danger" data-action="cancel" data-id="${appt.id}">Cancel</button>
+          </div>` : ''}
+        </div>
+      `;
+      return div;
+    }
+
+    function renderList(container, appointments){
+      container.innerHTML = '';
+      if(!appointments || appointments.length === 0){
+        container.innerHTML = '<div class="empty-state">No appointments scheduled</div>';
+        return;
+      }
+      appointments
+        .slice()
+        .sort((a,b) => b.id - a.id)
+        .forEach(a => container.appendChild(renderCard(a)));
+    }
+
+    function attachCardActions(container){
+      container.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action]');
+        if(!btn) return;
+        const id = btn.dataset.id;
+        if(btn.dataset.action === 'cancel'){
+          handleCancel(id);
+        } else if(btn.dataset.action === 'reschedule'){
+          openRescheduleModal(id);
+        }
+      });
+    }
+    attachCardActions(document.getElementById('all-list'));
+    attachCardActions(document.getElementById('search-list'));
+
+    // ---------- Load all ----------
+    async function loadAll(){
+      const container = document.getElementById('all-list');
+      container.innerHTML = '<div class="empty-state">Loading…</div>';
+      try{
+        const data = await apiCall(API_BASE);
+        renderList(container, data);
+      }catch(err){
+        container.innerHTML = '<div class="empty-state">Could not load appointments.</div>';
+      }
+    }
+
+    // ---------- Book form ----------
+    document.getElementById('book-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      clearFieldErrors(form);
+      const payload = {
+        patientName: form.patientName.value.trim(),
+        doctorName: form.doctorName.value.trim(),
+        appointmentDate: form.appointmentDate.value,
+        appointmentTime: form.appointmentTime.value ? form.appointmentTime.value + (form.appointmentTime.value.length === 5 ? ':00' : '') : '',
+        reason: form.reason.value.trim()
+      };
+      try{
+        await apiCall(API_BASE, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        });
+        showToast('Appointment booked.', 'success');
+        form.reset();
+      }catch(err){
+        if(err.status === 400 && err.data && err.data.errors){
+          Object.entries(err.data.errors).forEach(([field, msg]) => {
+            const target = form.querySelector(`[data-error-for="${field}"]`);
+            if(target) target.textContent = msg;
+          });
+          showToast('Please fix the highlighted fields.', 'error');
+        } else {
+          showToast(err.message, 'error');
+        }
+      }
+    });
+
+    // ---------- Cancel ----------
+    async function handleCancel(id){
+      if(!confirm('Cancel this appointment? This cannot be undone.')) return;
+      try{
+        await apiCall(`${API_BASE}/${id}`, { method:'DELETE' });
+        showToast('Appointment cancelled.', 'success');
+        refreshVisibleLists();
+      }catch(err){
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Reschedule modal ----------
+    let rescheduleId = null;
+    const modal = document.getElementById('reschedule-modal');
+
+    function openRescheduleModal(id){
+      rescheduleId = id;
+      document.getElementById('r-date').value = '';
+      document.getElementById('r-time').value = '';
+      modal.classList.add('show');
+    }
+    document.getElementById('r-cancel').addEventListener('click', () => modal.classList.remove('show'));
+    modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('show'); });
+
+    document.getElementById('r-confirm').addEventListener('click', async () => {
+      const date = document.getElementById('r-date').value;
+      const timeRaw = document.getElementById('r-time').value;
+      if(!date || !timeRaw){
+        showToast('Please choose both a date and a time.', 'error');
+        return;
+      }
+      const time = timeRaw.length === 5 ? timeRaw + ':00' : timeRaw;
+      try{
+        await apiCall(`${API_BASE}/${rescheduleId}/reschedule`, {
+          method:'PUT',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ appointmentDate:date, appointmentTime:time })
+        });
+        showToast('Appointment rescheduled.', 'success');
+        modal.classList.remove('show');
+        refreshVisibleLists();
+      }catch(err){
+        showToast(err.message, 'error');
+      }
+    });
+
+    function refreshVisibleLists(){
+      if(document.getElementById('tab-all').classList.contains('active')) loadAll();
+      if(document.getElementById('tab-search').classList.contains('active')) runSearch();
+    }
+
+    // ---------- Search ----------
+    async function runSearch(){
+      const container = document.getElementById('search-list');
+      const params = new URLSearchParams();
+      const patientName = document.getElementById('s-patient').value.trim();
+      const doctorName = document.getElementById('s-doctor').value.trim();
+      const status = document.getElementById('s-status').value;
+      if(patientName) params.append('patientName', patientName);
+      if(doctorName) params.append('doctorName', doctorName);
+      if(status) params.append('status', status);
+
+      container.innerHTML = '<div class="empty-state">Searching…</div>';
+      try{
+        const data = await apiCall(`${API_BASE}/search?${params.toString()}`);
+        renderList(container, data);
+      }catch(err){
+        container.innerHTML = '<div class="empty-state">Search failed.</div>';
+      }
+    }
+    document.getElementById('search-btn').addEventListener('click', runSearch);
+</script>
+
+</body>
+</html>
