@@ -10,21 +10,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Caacupe+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital@0;1&display=swap" rel="stylesheet">
     <style>
         :root{
-          --board:#B8CDF8;
-          --board-alt:#A2BBF0;
-          --board-line:rgba(21,22,26,0.14);
-          --amber:#F2B33D;
+          --hero:#0B3FD1;
+          --hero-deep:#082E9E;
+          --lime:#C6FF4D;
           --ink:#15161A;
           --ink-soft:#63656F;
           --paper:#FBFAF7;
           --surface:#FFFFFF;
           --line:#E4E1D9;
-          --accent:#2547D6;
-          --accent-dim:#1C36A8;
+          --accent:#0B3FD1;
+          --accent-dim:#082E9E;
           --moss:#1F8F5F;
           --amber-status:#B9750A;
           --brick:#C1352E;
-          --focus:#2547D6;
+          --focus:#0B3FD1;
         }
 
         *{box-sizing:border-box;}
@@ -51,114 +50,198 @@
           padding:0 24px 90px;
         }
 
-        /* ---------- Board header ---------- */
-        header.board{
-          background:var(--board);
-          color:var(--ink);
-          padding:0;
+        /* ---------- Hero header ---------- */
+        header.hero{
+          background:radial-gradient(140% 120% at 78% 18%, var(--hero) 0%, var(--hero-deep) 68%);
+          color:#fff;
           position:relative;
           overflow:hidden;
-          border-bottom:4px solid var(--ink);
+          padding:0 0 0;
         }
-        header.board .board-inner{
-          max-width:1080px;
+        .hero-inner{
+          max-width:1160px;
           margin:0 auto;
-          padding:46px 24px 34px;
+          padding:0 28px;
+          position:relative;
         }
-        .board-eyebrow{
+
+        .hero-topbar{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:16px;
+          padding:26px 0 0;
+          position:relative;
+          z-index:3;
+        }
+        .brand{
           display:flex;
           align-items:center;
           gap:9px;
-          font-family:'IBM Plex Mono', monospace;
-          font-size:12px;
+          font-family:'Inter', sans-serif;
           font-weight:700;
-          letter-spacing:.14em;
-          text-transform:uppercase;
-          color:rgba(21,22,26,0.72);
-          margin:0 0 18px;
+          font-size:14.5px;
+          letter-spacing:.01em;
+          color:#fff;
         }
-        .board-eyebrow .dot{
-          width:8px; height:8px;
+        .brand-dot{
+          width:9px; height:9px;
           border-radius:50%;
-          background:var(--ink);
-          box-shadow:0 0 0 3px rgba(21,22,26,0.1);
+          background:var(--lime);
+          box-shadow:0 0 0 4px rgba(198,255,77,.22);
+        }
+
+        nav.tabs{
+          display:flex;
+          gap:4px;
+          background:rgba(255,255,255,.12);
+          border:1px solid rgba(255,255,255,.18);
+          padding:4px;
+          border-radius:999px;
+          margin:0;
+        }
+        nav.tabs button{
+          font-family:'Inter', sans-serif;
+          font-size:12.5px;
+          font-weight:600;
+          letter-spacing:.02em;
+          background:none;
+          border:none;
+          color:rgba(255,255,255,.72);
+          padding:9px 18px;
+          cursor:pointer;
+          border-radius:999px;
+          transition:background .18s ease, color .18s ease;
+        }
+        nav.tabs button.active{
+          background:#fff;
+          color:var(--hero-deep);
+        }
+        nav.tabs button:hover:not(.active){color:#fff;}
+
+        .hero-status{
+          display:flex;
+          align-items:center;
+          gap:7px;
+          font-family:'IBM Plex Mono', monospace;
+          font-size:11px;
+          font-weight:600;
+          letter-spacing:.08em;
+          text-transform:uppercase;
+          color:rgba(255,255,255,.8);
+          background:rgba(255,255,255,.1);
+          border:1px solid rgba(255,255,255,.18);
+          padding:8px 14px;
+          border-radius:999px;
+        }
+        .hero-status .pulse{
+          width:6px; height:6px;
+          border-radius:50%;
+          background:var(--lime);
           animation:blink 1.6s ease-in-out infinite;
         }
         @keyframes blink{0%,100%{opacity:1;} 50%{opacity:.25;}}
 
+        .hero-content{
+          position:relative;
+          z-index:3;
+          padding:74px 0 130px;
+          max-width:600px;
+        }
         h1.title{
           font-family:'Caacupe One', 'Inter', sans-serif;
           font-weight:800;
-          font-size:clamp(30px, 5vw, 46px);
-          letter-spacing:.01em;
-          text-transform:uppercase;
-          margin:0 0 12px;
-          color:var(--ink);
-          display:flex;
-          flex-wrap:wrap;
+          font-size:clamp(34px, 5.2vw, 54px);
+          line-height:1.08;
+          letter-spacing:-0.01em;
+          margin:0 0 20px;
+          color:#fff;
         }
-        h1.title .ch{
-          display:inline-block;
-          min-width:0.62em;
-        }
-        h1.title .ch.space{min-width:.32em;}
+        h1.title .accent{color:var(--lime);}
 
         p.tagline{
-          margin:0;
-          color:rgba(21,22,26,0.75);
-          font-family:'IBM Plex Mono', monospace;
-          font-size:13.5px;
-          max-width:560px;
+          margin:0 0 34px;
+          color:rgba(255,255,255,.82);
+          font-family:'Inter', sans-serif;
+          font-size:15.5px;
+          max-width:440px;
           line-height:1.6;
         }
 
-        .board-ticks{
-          display:flex;
-          height:6px;
-        }
-        .board-ticks span{
-          flex:1;
-          border-right:1px solid var(--board-line);
-        }
-        .board-ticks span:nth-child(4n){background:rgba(21,22,26,.22);}
-
-        /* ---------- Tabs (underline style) ---------- */
-        nav.tabs{
-          display:flex;
-          gap:28px;
-          border-bottom:1px solid var(--line);
-          margin:0 0 32px;
-          padding-top:26px;
-        }
-        nav.tabs button{
-          font-family:'IBM Plex Mono', monospace;
-          font-size:12.5px;
-          font-weight:600;
-          letter-spacing:.1em;
-          text-transform:uppercase;
-          background:none;
+        .hero-cta{
+          font-family:'Inter', sans-serif;
+          font-size:13.5px;
+          font-weight:700;
+          letter-spacing:.02em;
+          background:#fff;
+          color:var(--hero-deep);
           border:none;
-          color:var(--ink-soft);
-          padding:0 0 14px;
+          padding:14px 26px;
+          border-radius:999px;
           cursor:pointer;
-          position:relative;
-          transition:color .15s ease;
+          transition:transform .15s ease, box-shadow .15s ease;
+          box-shadow:0 14px 30px -12px rgba(0,0,0,.45);
         }
-        nav.tabs button::after{
-          content:"";
-          position:absolute;
-          left:0; right:0; bottom:-1px;
-          height:2px;
-          background:var(--accent);
-          transform:scaleX(0);
-          transform-origin:left;
-          transition:transform .2s ease;
-        }
-        nav.tabs button.active{color:var(--ink);}
-        nav.tabs button.active::after{transform:scaleX(1);}
-        nav.tabs button:hover:not(.active){color:var(--ink);}
+        .hero-cta:hover{transform:translateY(-1px);}
+        .hero-cta:active{transform:translateY(0);}
 
-        main{padding-top:4px;}
+        .hero-visual{
+          position:absolute;
+          top:-40px; right:-60px;
+          width:640px; height:640px;
+          z-index:2;
+          pointer-events:none;
+        }
+        .hero-visual svg{width:100%; height:100%; display:block;}
+        .hero-visual .vortex-group{
+          transform-origin:300px 300px;
+          animation:vortexSpin 90s linear infinite;
+        }
+        @keyframes vortexSpin{from{transform:rotate(0deg);} to{transform:rotate(360deg);}}
+
+        .hero-footer{
+          position:relative;
+          z-index:3;
+          display:flex;
+          align-items:flex-end;
+          justify-content:space-between;
+          padding:0 0 34px;
+          flex-wrap:wrap;
+          gap:16px;
+        }
+        .hero-stat{display:flex; flex-direction:column; gap:4px;}
+        .hero-stat span{
+          font-family:'IBM Plex Mono', monospace;
+          font-size:30px;
+          font-weight:700;
+          color:#fff;
+          line-height:1;
+        }
+        .hero-stat small{
+          font-family:'IBM Plex Mono', monospace;
+          font-size:11px;
+          letter-spacing:.08em;
+          text-transform:uppercase;
+          color:rgba(255,255,255,.65);
+        }
+        .hero-scroll{
+          font-family:'IBM Plex Mono', monospace;
+          font-size:11px;
+          letter-spacing:.08em;
+          text-transform:uppercase;
+          color:rgba(255,255,255,.6);
+        }
+
+        .hero-bar{
+          position:relative;
+          z-index:3;
+          height:10px;
+          margin:0 28px;
+          background:rgba(255,255,255,.92);
+          border-radius:999px 999px 0 0;
+        }
+
+        main{padding-top:40px;}
 
         section{display:none;}
         section.active{display:block; animation:fadeIn .28s ease;}
@@ -421,33 +504,49 @@
           form.card-form{grid-template-columns:1fr;}
           .ledger-card{grid-template-columns:1fr;}
           .card-side{align-items:flex-start; margin-top:10px;}
-          nav.tabs{gap:18px; overflow-x:auto;}
-          header.board .board-inner{padding:36px 20px 26px;}
+          nav.tabs{overflow-x:auto;}
+          .hero-visual{opacity:.35; width:420px; height:420px; top:-20px; right:-100px;}
+          .hero-content{padding:60px 0 90px;}
+          .hero-topbar{flex-wrap:wrap;}
         }
     </style>
 </head>
 <body>
 
-<header class="board">
-    <div class="board-inner">
-        <p class="board-eyebrow"><span class="dot"></span>Terminal &middot; Patient Scheduling Desk</p>
-        <h1 class="title" id="board-title" data-text="APPOINTMENT SCHEDULER"></h1>
-        <p class="tagline">BOOK &middot; RESCHEDULE &middot; CANCEL — all appointments tracked in real time.</p>
+<header class="hero">
+    <div class="hero-inner">
+        <div class="hero-topbar">
+            <div class="brand"><span class="brand-dot"></span>Appointment Scheduler</div>
+            <nav class="tabs">
+                <button data-tab="book" class="active">Book</button>
+                <button data-tab="all">All Appointments</button>
+                <button data-tab="search">Search</button>
+            </nav>
+            <div class="hero-status"><span class="pulse"></span>Live</div>
+        </div>
+
+        <div class="hero-content">
+            <h1 class="title">Care that fits<br>your <span class="accent">schedule</span>.</h1>
+            <p class="tagline">Book, reschedule, and cancel appointments in real time — no phone calls, no waiting on hold.</p>
+            <button class="hero-cta" id="hero-cta">Start booking &rarr;</button>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+            <svg id="vortex-svg" viewBox="0 0 600 600"></svg>
+        </div>
+
+        <div class="hero-footer">
+            <div class="hero-stat">
+                <span id="hero-count">0</span>
+                <small>Appointments booked</small>
+            </div>
+            <div class="hero-scroll">Scroll to explore &darr;</div>
+        </div>
     </div>
-    <div class="board-ticks">
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-    </div>
+    <div class="hero-bar"></div>
 </header>
 
 <div class="shell">
-    <nav class="tabs">
-        <button data-tab="book" class="active">Book</button>
-        <button data-tab="all">All Appointments</button>
-        <button data-tab="search">Search</button>
-    </nav>
-
     <main>
         <!-- BOOK -->
         <section id="tab-book" class="active">
@@ -544,37 +643,84 @@
 <div id="toast"></div>
 
 <script>
-    // ---------- Split-flap title reveal ----------
+    // ---------- Generate the particle vortex visual ----------
     (function(){
-      const el = document.getElementById('board-title');
-      const finalText = el.dataset.text;
-      const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      const spans = [...finalText].map(ch => {
-        const span = document.createElement('span');
-        span.className = 'ch' + (ch === ' ' ? ' space' : '');
-        span.textContent = ch === ' ' ? '\u00A0' : ch;
-        return span;
-      });
-      spans.forEach(s => el.appendChild(s));
+      const svg = document.getElementById('vortex-svg');
+      const ns = 'http://www.w3.org/2000/svg';
+      const cx = 300, cy = 300;
+      const group = document.createElementNS(ns, 'g');
+      group.setAttribute('class', 'vortex-group');
 
-      spans.forEach((span, i) => {
-        if(span.classList.contains('space')) return;
-        const finalChar = finalText[i];
-        let ticks = 0;
-        const maxTicks = 6 + Math.floor(Math.random()*6);
-        const interval = setInterval(() => {
-          ticks++;
-          if(ticks >= maxTicks){
-            span.textContent = finalChar;
-            clearInterval(interval);
-          } else {
-            span.textContent = charset[Math.floor(Math.random()*charset.length)];
-          }
-        }, 45);
-      });
+      const lineCount = 140;
+      for(let i = 0; i < lineCount; i++){
+        const angle = (i / lineCount) * Math.PI * 2;
+        const radius = 150 + Math.random() * 130;
+        const jitter = (Math.random() - 0.5) * 0.5;
+        const x1 = cx + Math.cos(angle) * radius;
+        const y1 = cy + Math.sin(angle) * radius;
+        const ctrlAngle = angle + 0.9 + jitter;
+        const ctrlRadius = radius * 0.55;
+        const cx1 = cx + Math.cos(ctrlAngle) * ctrlRadius;
+        const cy1 = cy + Math.sin(ctrlAngle) * ctrlRadius;
+        const endRadius = 4 + Math.random() * 10;
+        const endAngle = angle + 2.4 + jitter;
+        const x2 = cx + Math.cos(endAngle) * endRadius;
+        const y2 = cy + Math.sin(endAngle) * endRadius;
+
+        const path = document.createElementNS(ns, 'path');
+        path.setAttribute('d', `M${x1},${y1} Q${cx1},${cy1} ${x2},${y2}`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', '#ffffff');
+        path.setAttribute('stroke-width', (0.5 + Math.random() * 0.8).toFixed(2));
+        path.setAttribute('opacity', (0.08 + Math.random() * 0.3).toFixed(2));
+        group.appendChild(path);
+
+        if(Math.random() < 0.35){
+          const dot = document.createElementNS(ns, 'circle');
+          dot.setAttribute('cx', x1);
+          dot.setAttribute('cy', y1);
+          dot.setAttribute('r', (0.8 + Math.random() * 1.4).toFixed(2));
+          dot.setAttribute('fill', '#ffffff');
+          dot.setAttribute('opacity', (0.3 + Math.random() * 0.4).toFixed(2));
+          group.appendChild(dot);
+        }
+      }
+
+      const core = document.createElementNS(ns, 'circle');
+      core.setAttribute('cx', cx);
+      core.setAttribute('cy', cy);
+      core.setAttribute('r', 5);
+      core.setAttribute('fill', '#ffffff');
+      core.setAttribute('opacity', '0.9');
+      group.appendChild(core);
+
+      svg.appendChild(group);
     })();
 
     const API_BASE = 'http://localhost:8080/api/appointments';
+
+    // ---------- Hero live appointment count ----------
+    async function loadHeroCount(){
+      const el = document.getElementById('hero-count');
+      try{
+        const res = await fetch(API_BASE);
+        if(!res.ok) throw new Error('failed');
+        const data = await res.json();
+        el.textContent = Array.isArray(data) ? data.length : 0;
+      }catch(e){
+        el.textContent = '—';
+      }
+    }
+    loadHeroCount();
+
+    // ---------- Hero CTA scrolls to and activates the Book tab ----------
+    document.getElementById('hero-cta').addEventListener('click', () => {
+      document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('main section').forEach(s => s.classList.remove('active'));
+      document.querySelector('nav.tabs button[data-tab="book"]').classList.add('active');
+      document.getElementById('tab-book').classList.add('active');
+      document.querySelector('.shell').scrollIntoView({ behavior: 'smooth' });
+    });
 
     // ---------- Tab switching ----------
     document.querySelectorAll('nav.tabs button').forEach(btn => {
@@ -722,6 +868,7 @@
         });
         showToast('Appointment booked.', 'success');
         form.reset();
+        loadHeroCount();
       }catch(err){
         if(err.status === 400 && err.data && err.data.errors){
           Object.entries(err.data.errors).forEach(([field, msg]) => {
